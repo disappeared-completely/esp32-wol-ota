@@ -5,19 +5,22 @@ Wake-on-LAN project.
 
 ## Current safe OTA release
 
-- Firmware: `ESP32_USB_WiFi_Configurator_v4.3-telegram-maintenance.bin`
-- Version: `v4.3-telegram-maintenance`
-- SHA256: `28C0890612C6610617BC8C54E366C744EFA481A470B49CDC0A81EB62E39A37BA`
+- Firmware: `ESP32_USB_WiFi_Configurator_v4.4-12h-maintenance-reboot.bin`
+- Version: `v4.4-12h-maintenance-reboot`
+- SHA256: `3B4D1CB990DA1277554F130D03E5CB8EC0CF433B048B3C1A09DEB0E151C2E52C`
 
-This release improves Wi-Fi and Telegram recovery after an internet outage,
-ignores duplicate Telegram updates, and delays OTA confirmation until Wi-Fi
-and Telegram connectivity have been verified. If verification does not
-succeed within five minutes, ESP32 requests rollback to the previous firmware.
+This release adds an automatic maintenance reboot every 12 hours of ESP32
+uptime. If power is lost, the ESP32 simply starts fresh when power returns,
+and the 12-hour timer starts again from boot. The maintenance reboot is skipped
+while OTA is running or while a newly installed OTA firmware is still in its
+five-minute verification window.
 
-The v4.3 maintenance release also periodically recreates the Telegram TLS
-client, resets it after slow or failed Telegram operations, adds `/diag`, and
-schedules `/reboot PIN` with a short delay so the Telegram reply can be sent
-before restart.
+It keeps the v4.3 Telegram maintenance behavior: periodic Telegram TLS client
+recreation, client reset after slow or failed Telegram operations, `/diag`, and
+a short delayed `/reboot PIN` so the Telegram reply can be sent before restart.
+It also keeps the v4.2 safe OTA rollback behavior: OTA confirmation waits until
+Wi-Fi and Telegram connectivity have been verified, and requests rollback if
+verification does not succeed within five minutes.
 
 ## Safety
 
