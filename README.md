@@ -5,15 +5,17 @@ Wake-on-LAN project.
 
 ## Current safe OTA release
 
-- Firmware: `ESP32_USB_WiFi_Configurator_v4.4-12h-maintenance-reboot.bin`
-- Version: `v4.4-12h-maintenance-reboot`
-- SHA256: `3B4D1CB990DA1277554F130D03E5CB8EC0CF433B048B3C1A09DEB0E151C2E52C`
+- Firmware: `ESP32_USB_WiFi_Configurator_v4.5-3h-maintenance-reboot.bin`
+- Version: `v4.5-3h-maintenance-reboot`
+- SHA256: `5B7B00A64C693996F842624031357AA78BB9BE2C0DA20955CF68D1A2A6C84577`
 
-This release adds an automatic maintenance reboot every 12 hours of ESP32
-uptime. If power is lost, the ESP32 simply starts fresh when power returns,
-and the 12-hour timer starts again from boot. The maintenance reboot is skipped
-while OTA is running or while a newly installed OTA firmware is still in its
-five-minute verification window.
+This release changes the automatic maintenance reboot interval from 12 hours
+to 3 hours of ESP32 uptime. This is a normal software restart, not a firmware
+write, so it should not wear out flash memory or harm the ESP32. If power is
+lost, the ESP32 simply starts fresh when power returns, and the 3-hour timer
+starts again from boot. The maintenance reboot is skipped while OTA is running
+or while a newly installed OTA firmware is still in its five-minute verification
+window.
 
 It keeps the v4.3 Telegram maintenance behavior: periodic Telegram TLS client
 recreation, client reset after slow or failed Telegram operations, `/diag`, and
