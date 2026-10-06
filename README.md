@@ -3,11 +3,31 @@
 OTA firmware releases for the ESP32 USB Wi-Fi Configurator and Telegram
 Wake-on-LAN project.
 
-## Current safe OTA release
+## Current OTA release
 
-- Firmware: `ESP32_USB_WiFi_Configurator_v4.6-power-on-wol.bin`
-- Version: `v4.6-power-on-wol`
-- SHA256: `4939E3B14B9DDECB14E574347C336F1A2EE1D4154BD5CCF826F0BB59B4A21951`
+- Firmware: `ESP32_USB_WiFi_Configurator_v4.7-telegram-ota-recovery.bin`
+- Version: `v4.7-telegram-ota-recovery`
+- SHA256: `603E00A89EC46A5FBDD7395425A0A5624C8D0AD94DBC23D40BA96DB304E2B045`
+
+This release fixes a Telegram message lifetime defect: a slow or failed reply
+could delete the bot while its command handler still borrowed the message/chat
+ID. The handler and remote OTA now own independent copies. A reset client is
+restored for the final OTA result; `/status` and `/diag` also report the last
+remote OTA error/result, held in RAM until reboot.
+
+Telegram TLS handshakes have a separate 5-second timeout; remote OTA HTTPS
+handshakes have a 15-second timeout. These are not total request deadlines.
+This fixes a confirmed code defect but cannot establish the exact reason for
+an earlier failed update without its Serial error log. It does not add an
+independent watchdog or guarantee recovery from every network stall.
+
+If the installed firmware responds slowly, use `/reboot YOUR_PIN`, wait for
+it to return, then retry OTA. The old firmware must still receive the update
+command; publishing this release cannot force an unresponsive ESP32 to install
+it. `OTA started` only confirms acceptance. Check `/version` after restart for
+`v4.7-telegram-ota-recovery` to confirm installation.
+
+The automatic wake feature introduced in v4.6 is retained:
 
 After power-on or brownout, ESP32 waits for a saved Wi-Fi network and an IP
 address, then sends WOL to the saved target. Internet access and Telegram are
@@ -39,11 +59,11 @@ It also keeps the v4.2 safe OTA rollback behavior: OTA confirmation waits until
 Wi-Fi and Telegram connectivity have been verified, and requests rollback if
 verification does not succeed within five minutes.
 
-Validation: firmware compile passed; the application image is 1,215,536 bytes
+Validation: firmware compile passed; the application image is 1,216,432 bytes
 and fits the existing 1,310,720-byte OTA slot. Image checksum and validation hash
 passed. Existing v4.5 source was compared to verify that changes are limited to
-the new power-on WOL feature, its diagnostics, and version. Physical power-cut
-testing on the remote board was not available.
+power-on WOL, Telegram/OTA recovery, diagnostics, and version. Physical power-cut
+and slow-network tests on the remote board were not available.
 
 ## Safety
 
