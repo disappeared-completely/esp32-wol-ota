@@ -3,7 +3,46 @@
 OTA firmware releases for the ESP32 USB Wi-Fi Configurator and Telegram
 Wake-on-LAN project.
 
-## Current OTA release
+## Candidate Telegram Recovery Update
+
+- Version: `v4.9-telegram-http-recovery` (pre-release, not automatically installed)
+- Firmware: `ESP32_USB_WiFi_Configurator_v4.9-telegram-http-recovery.bin`
+- SHA256: `3AE51057346D4239E9CCBC1D1A5FDDD104814FB70AE69F0484EFEB9D57DE14C2`
+- Image size: 1,218,912 bytes; existing OTA slot: 1,310,720 bytes.
+- [Download candidate](https://github.com/disappeared-completely/esp32-wol-ota/releases/download/v4.9-telegram-http-recovery/ESP32_USB_WiFi_Configurator_v4.9-telegram-http-recovery.bin)
+
+This candidate replaces the Telegram library's incomplete HTTP response reader
+with the ESP32 core HTTPClient. TLS can stay open across empty polls instead of
+requiring another handshake each time. HTTP/API/JSON errors are no longer
+reported as an empty successful poll. Replies use one checked request instead
+of a hidden retry loop; poll failures back off and rate-limit hints are honored
+up to 60 seconds. `/diag` adds safe error codes and poll/send failure counters.
+
+It retains Wi-Fi profiles, the allowed-chat check, USB/editor commands, LED and
+local endpoints, WOL target, power-on WOL scheduling and OTA verification.
+`/wake` remains without a PIN; `/reboot` and `/ota` still require the saved PIN.
+All stored credentials remain in NVS. No real secrets are included in the image.
+
+Validation: ESP32 compile, image checksum/hash and slot-size checks passed.
+48 regression checks execute the production Telegram transport with real
+ArduinoJson and fake HTTP/TLS/Arduino APIs. 70 checks execute the production
+power-on WOL scheduler. Tests ran as WebAssembly, not new Windows executables.
+They do not establish real ESP32 HTTP/TLS behavior, live Telegram latency or
+physical wake. This update needs an on-device check and remains a pre-release.
+
+Response buffering is capped at 32 KiB, with filtered JSON parsing. Stalled body
+reads have an elapsed-time guard, but DNS/connect/TLS still use core timeouts:
+there is no hard end-to-end request deadline or independent watchdog. TLS
+certificate validation remains disabled as in the previous firmware.
+
+Send one OTA command with the candidate URL and its SHA256, then wait. Check
+`/version` for `v4.9-telegram-http-recovery`, then `/ping` and `/diag` immediately
+and again after 15 minutes. Look for `Telegram transport: HTTPClient keep-alive`,
+poll duration, failures/resets and free/max-alloc heap. The previous firmware
+must still receive OTA; publishing an asset cannot force an offline device to
+install it. Use `YOUR_PIN` as a placeholder, never publish your actual PIN.
+
+## Previous Published Release
 
 - Firmware: `ESP32_USB_WiFi_Configurator_v4.8-delayed-power-on-wol.bin`
 - Version: `v4.8-delayed-power-on-wol`
